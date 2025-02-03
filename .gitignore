@@ -1,0 +1,53 @@
+# Игнорируем файлы IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Игнорируем зависимости Go
+vendor/
+go.sum
+
+# Игнорируем бинарные файлы Go
+bin/
+*.exe
+*.out
+
+# Игнорируем зависимости Node.js
+node_modules/
+package-lock.json
+yarn.lock
+
+# Игнорируем скомпилированные файлы TypeScript/JavaScript
+dist/
+build/
+*.js
+*.map
+
+# Игнорируем логи
+*.log
+
+# Игнорируем Docker-образы и временные файлы
+*.tar.gz
+*.dockerignore
+
+# Игнорируем локальные конфигурации
+.env
+.env.local
+.env.development
+.env.production
+
+# Игнорируем данные PostgreSQL
+/postgres/data/
+
+# Игнорируем сгенерированные protobuf-файлы
+*.pb.go
+*.pb.ts
+
+# Игнорируем временные файлы
+tmp/
+temp/
+
+# Игнорируем специфичные для проекта файлы
+.DS_Store
+Thumbs.db
