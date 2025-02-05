@@ -19,7 +19,7 @@ func connectDB() (*sqlx.DB, error) {
 
 func main() {
 	var err error
-	if err = godotenv.Load("../.env"); err != nil {
+	if err = godotenv.Load(); err != nil {
 		log.Fatal("Error when uploading .env file", err)
 	}
 

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
@@ -23,11 +25,33 @@ func AddContainer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	_, err = db.Exec("INSERT INTO containers (ip, status, last_ping_time) VALUES ($1, $2, $3)",
-		container.IP, container.Status, container.LastPingTime)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+
+	var existingID int
+	err = db.QueryRow("SELECT id FROM containers WHERE ip = $1", container.IP).Scan(&existingID)
+
+	// если такой контейнер уже есть
+	if err == nil {
+		_, err = db.Exec("UPDATE containers SET status = $1, last_ping_time = $2 WHERE ip = $3",
+			container.Status, container.LastPingTime, container.IP)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
 		return
 	}
-	w.WriteHeader(http.StatusCreated)
+
+	// если такого контейнера нет
+	if errors.Is(err, sql.ErrNoRows) {
+		_, err = db.Exec("INSERT INTO containers (ip, status, last_ping_time) VALUES ($1, $2, $3)",
+			container.IP, container.Status, container.LastPingTime)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusCreated)
+	}
+
+	// Если произошла другая ошибка
+	http.Error(w, err.Error(), http.StatusInternalServerError)
 }

@@ -32,7 +32,7 @@ build/
 *.dockerignore
 
 # Игнорируем локальные конфигурации
-.env
+backend/.env
 .env.local
 .env.development
 .env.production
