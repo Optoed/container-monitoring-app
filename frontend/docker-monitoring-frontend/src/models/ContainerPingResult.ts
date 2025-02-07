@@ -3,5 +3,5 @@ export interface ContainerPingResult {
     ip: string;
     status: string;
     lastPingTime: string;
-    pingDuration?: number;
+    pingDuration: number;
 }

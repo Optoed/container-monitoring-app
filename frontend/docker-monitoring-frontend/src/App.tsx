@@ -9,7 +9,17 @@ const App: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             const results = await getPingResults();
-            setData(results);
+            console.log("results = ", results)
+
+            const transformedResults = results.map((result: any) => {
+                const lastPingTime = new Date(result.lastPingTime).toLocaleString();
+                return {
+                    ...result,
+                    lastPingTime,
+                };
+            });
+            setData(transformedResults);
+            console.log("transformedResults = ", transformedResults)
         };
         fetchData();
 
