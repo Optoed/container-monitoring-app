@@ -1,8 +1,9 @@
 package main
 
 import (
-	"backend/handlers"
+	"backend/containerHandler"
 	"fmt"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -53,13 +54,21 @@ func main() {
 	defer DB.Close()
 
 	// Создаем хэндлеры и передаем им ссылку на базу данных
-	handler := &handlers.Handler{DB: DB}
+	handler := &containerHandler.Handler{DB: DB}
 
 	r := mux.NewRouter()
 	r.HandleFunc("/containers", handler.GetContainers).Methods("GET")
 	r.HandleFunc("/containers", handler.AddContainer).Methods("POST")
 
-	http.Handle("/", r)
+	// Разрешим политику CORS только для нашего фронтенда, http://localhost:3000 - для теста на локальном пк
+	// TODO поменяй http://localhost:3000 на URL сервиса frontend поднятого в docker
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
+	originsOk := handlers.AllowedOrigins([]string{"http://localhost:3000"})
+
+	// Оборачиваем наш маршрутизатор с CORS middleware
+	http.Handle("/", handlers.CORS(originsOk, headersOk, methodsOk)(r))
+
 	fmt.Println("Backend service started on 0.0.0.0:8080")
 	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
 }

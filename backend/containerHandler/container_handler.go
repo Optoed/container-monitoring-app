@@ -1,4 +1,4 @@
-package handlers
+package containerHandler
 
 import (
 	"backend/models"

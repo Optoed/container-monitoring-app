@@ -1,26 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// src/App.tsx
+import React, { useEffect, useState } from 'react';
+import { getPingResults } from './api/api';
+import ContainersPingTable from './components/Table';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App: React.FC = () => {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const results = await getPingResults();
+            setData(results);
+        };
+        fetchData();
+
+        const interval = setInterval(fetchData, 10000); // Обновление каждые 10 секунд
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div style={{ padding: '20px' }}>
+            <h1>Ping Results</h1>
+            <ContainersPingTable data={data} />
+        </div>
+    );
+};
 
 export default App;
