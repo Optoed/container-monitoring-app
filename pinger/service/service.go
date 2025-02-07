@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"bytes"
@@ -6,26 +6,31 @@ import (
 	"github.com/go-ping/ping"
 	"log"
 	"net/http"
-	"os"
 	"os/exec"
+	"pinger/models"
 	"strings"
 	"time"
 )
 
-func getContainers() ([]string, error) {
-	cmd := exec.Command("docker", "ps", "-q")
+func GetContainers() ([]string, error) {
+	cmd := exec.Command("docker", "ps", "-aq")
 	output, err := cmd.Output()
+	log.Printf("output, err := cmd.Output(); output = %s, err = %v\n", output, err)
 	if err != nil {
 		return nil, err
 	}
 
 	containersID := string(output)
+	log.Println("containersID := string(output); containersID = ", containersID)
 	ids := strings.Fields(containersID)
+	log.Println("ids := strings.Fields(containersID); ids = ", ids)
 
 	var ips []string
 	for _, id := range ids {
+		log.Println("id in range ids = ", id)
 		psCmd := exec.Command("docker", "inspect", "--format", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", id)
 		ip, err := psCmd.Output()
+		log.Println("ip = ", ip)
 		if err != nil {
 			log.Printf("Error getting IP for container %s: %v", id, err)
 			continue
@@ -33,10 +38,11 @@ func getContainers() ([]string, error) {
 		ips = append(ips, strings.TrimSpace(string(ip)))
 	}
 
+	log.Println("ips = ", ips)
 	return ips, nil
 }
 
-func pingContainer(ip string) (string, time.Duration, error) {
+func PingContainer(ip string) (string, time.Duration, error) {
 	pinger, err := ping.NewPinger(ip)
 	if err != nil {
 		return "", 0, err
@@ -58,8 +64,9 @@ func pingContainer(ip string) (string, time.Duration, error) {
 	return "alive", stats.AvgRtt, nil
 }
 
-func sendPingResult(container *Container) error {
-	url := os.Getenv("BACKEND_URL") + "/containers" // URL backend API
+func SendPingResult(container *models.Container) error {
+	//url := os.Getenv("BACKEND_URL") + "/containers" // URL backend API
+	url := "http://backend:8080/containers"
 	data, err := json.Marshal(container)
 	if err != nil {
 		return err

@@ -5,26 +5,41 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"log"
 	"net/http"
-	"os"
+	"time"
 )
 
 var DB *sqlx.DB
 
-func connectDB() (*sqlx.DB, error) {
-	return sqlx.Connect("postgres", os.Getenv("DATABASE_URL"))
-}
+/*
+   DB_HOST: db
+   DB_PORT: 5432
+   DB_USER: postgres
+   DB_PASSWORD: postgres
+   DB_NAME: postgres
+*/
 
 func main() {
-	var err error
-	if err = godotenv.Load(); err != nil {
-		log.Fatal("Error when uploading .env file", err)
-	}
+	var (
+		host     = "db"
+		port     = 5432
+		user     = "postgres"
+		password = "postgres"
+		dbname   = "postgres"
+	)
 
-	DB, err = connectDB()
+	databaseURL := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+
+	var err error
+	for i := 0; i < 10; i++ {
+		DB, err = sqlx.Connect("postgres", databaseURL)
+		if err == nil {
+			break
+		}
+		time.Sleep(5 * time.Second)
+	}
 	if err != nil {
 		log.Fatal("Couldn't connect to the database:", err)
 	}
@@ -45,6 +60,6 @@ func main() {
 	r.HandleFunc("/containers", handler.AddContainer).Methods("POST")
 
 	http.Handle("/", r)
-	fmt.Println("Backend service started on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Println("Backend service started on 0.0.0.0:8080")
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
 }
