@@ -15,8 +15,8 @@ bin/
 
 # Игнорируем зависимости Node.js
 node_modules/
-package-lock.json
-yarn.lock
+# package-lock.json
+# yarn.lock
 
 # Игнорируем скомпилированные файлы TypeScript/JavaScript
 dist/

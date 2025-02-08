@@ -74,3 +74,22 @@
   docker-compose down --volumes
   docker-compose up --build
   ```
+
+## [0.10.2] - 08-02-2025 - ветка containerize-frontend
+### Изменено
+- добавлен yarn.lock в репозиторий (и убран из .gitignore)
+
+## [0.10.3] - 08-02-2025 - ветка containerize-frontend
+### Изменено
+- разрешен конфликт с политикой CORS как для frontend (поднимаемом в контейнере), так и на локальном frontend сервисе
+
+## [0.10.4] - 08-02-2025 - ветка containerize-frontend -> (merge) main
+### Изменено
+- в postgres ping_duration теперь храним в наносекундах как BIGINT
+- во frontend отображаем в ms (делим на 1e6)
+- container_handler отправляет просто в наносекундах (ns)
+
+**merge containerize-frontend в main!**
+
+
+

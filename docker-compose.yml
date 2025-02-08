@@ -56,9 +56,11 @@ services:
       - "80:80"
     depends_on:
       - backend
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8080  # Для хоста (если это локальный запуск)
     networks:
       - app-network
 
 networks:
   app-network:
-    driver: bridge
+    name: app-network

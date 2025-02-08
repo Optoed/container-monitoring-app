@@ -10,7 +10,7 @@ const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id'},
     { title: 'IP', dataIndex: 'ip', key: 'ip' },
     { title: 'Status', dataIndex: 'status', key: 'status' },
-    { title: 'Last Ping Time', dataIndex:  'lastPingTime', key: 'lastPingTime' },
+    { title: 'Last Ping Time', dataIndex:  'last_ping_time', key: 'last_ping_time' },
     { title: 'Ping Duration (ms)', dataIndex: 'ping_duration', key: 'ping_duration'},
 ];
 

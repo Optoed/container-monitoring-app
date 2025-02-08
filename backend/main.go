@@ -54,11 +54,13 @@ func main() {
 	r.HandleFunc("/containers", handler.GetContainers).Methods("GET")
 	r.HandleFunc("/containers", handler.AddContainer).Methods("POST")
 
-	// Разрешим политику CORS только для нашего фронтенда, http://localhost:3000 - для теста на локальном пк
+	// Разрешим политику CORS только для собственного фронтенда,
+	// http://localhost:3000 - для взаимодействия на локальном пк
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
-	frontendURL := os.Getenv("")
-	originsOk := handlers.AllowedOrigins([]string{frontendURL})
+	containerizedFrontendURL := os.Getenv("FRONTEND_URL")
+	localFrontendURL := "http://localhost:3000"
+	originsOk := handlers.AllowedOrigins([]string{containerizedFrontendURL, localFrontendURL})
 
 	// Оборачиваем наш маршрутизатор с CORS middleware
 	http.Handle("/", handlers.CORS(originsOk, headersOk, methodsOk)(r))

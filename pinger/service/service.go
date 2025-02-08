@@ -59,11 +59,13 @@ func PingContainer(ip string) (string, time.Duration, error) {
 	}
 
 	stats := pinger.Statistics()
+	pingDuration := stats.AvgRtt
+
 	if stats.PacketLoss > 0 {
-		return "down", stats.AvgRtt, nil
+		return "down", pingDuration, nil
 	}
 
-	return "alive", stats.AvgRtt, nil
+	return "alive", pingDuration, nil
 }
 
 func SendPingResult(container *models.Container) error {
