@@ -14,6 +14,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: postgres
+      FRONTEND_URL: http://frontend:80
     networks:
       - app-network
 
@@ -35,7 +36,8 @@ services:
       BACKEND_ROUTE: containers
 
   db:
-    image: postgres
+    build:
+      context: ./database
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
@@ -46,6 +48,18 @@ services:
       - app-network
     ports:
       - "5432:5432"
+
+  frontend:
+    build:
+      context: ./frontend/docker-monitoring-frontend
+      args:
+        - REACT_APP_BACKEND_URL=http://backend:8080
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
 
 networks:
   app-network:

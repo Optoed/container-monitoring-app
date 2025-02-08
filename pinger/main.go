@@ -9,43 +9,35 @@ import (
 )
 
 func main() {
-	//if err := godotenv.Load(); err != nil {
-	//	log.Fatal("Error loading .env file")
-	//}
-
-	var mu sync.Mutex
-	var wg sync.WaitGroup
+	var (
+		mu sync.Mutex
+		wg sync.WaitGroup
+	)
 
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
 	log.Println("ticker has been started")
 
-	countOfInterations := 0
+	countOfIterations := 0
 	for {
-		countOfInterations++
-		log.Printf("iteration №%v\n", countOfInterations)
+		countOfIterations++
+		log.Printf("iteration №%v\n", countOfIterations)
 		select {
 		case <-ticker.C:
-			log.Println("before getting ips, err := service.GetContainers()")
-
 			ips, err := service.GetContainers()
 			if err != nil {
 				log.Printf("Error getting containers: %v", err)
 				continue
 			}
+			log.Println("IPs of containers = ", ips, " and len(ips) = ", len(ips))
 
-			log.Println("ips:", ips, len(ips))
-
-			for i, ip := range ips {
-
-				log.Printf("№%v ip = %v\n", i, ip)
-
+			for _, ip := range ips {
+				// log.Printf("№%v ip = %v\n", i, ip)
 				wg.Add(1)
 
 				go func(ip string) {
-					log.Println("in go func(ip string) with ip = ", ip)
-
+					// log.Println("in go func(ip string) with ip = ", ip)
 					defer wg.Done()
 
 					status, pingDuration, err := service.PingContainer(ip)
@@ -62,12 +54,10 @@ func main() {
 						LastPingTime: time.Now(),
 					}
 
-					log.Println("created container : ", container)
+					log.Println("created container : ", container.IP, container.Status, container.LastPingTime, container.PingDuration)
 
 					mu.Lock()
-					log.Println("before err = service.SendPingResult(container)")
 					err = service.SendPingResult(container)
-					log.Println("after err = service.SendPingResult(container); err = ", err)
 					mu.Unlock()
 
 					if err != nil {

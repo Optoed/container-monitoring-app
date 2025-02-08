@@ -55,10 +55,10 @@ func main() {
 	r.HandleFunc("/containers", handler.AddContainer).Methods("POST")
 
 	// Разрешим политику CORS только для нашего фронтенда, http://localhost:3000 - для теста на локальном пк
-	// TODO поменяй http://localhost:3000 на URL сервиса frontend поднятого в docker
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
-	originsOk := handlers.AllowedOrigins([]string{"http://localhost:3000"})
+	frontendURL := os.Getenv("")
+	originsOk := handlers.AllowedOrigins([]string{frontendURL})
 
 	// Оборачиваем наш маршрутизатор с CORS middleware
 	http.Handle("/", handlers.CORS(originsOk, headersOk, methodsOk)(r))
