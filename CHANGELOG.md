@@ -61,7 +61,16 @@
 ### Изменено
 - Теперь frontend отображает last ping time и ping duration корректно
 
-## [0.10.2] - 08-02-2025
+## [0.10.0] - 08-02-2025 - ветка containerize-frontend
 ### Добавлено
 - ветка containerize-frontend
 - контейнеризация frontend (пока frontend не видит backend)
+
+## [0.10.1] - 08-02-2025 - ветка containerize-frontend
+### Изменено
+- убран volumes для сервиса db из docker-compose.yml
+- **Запускай с очищением кэша и томов volume** (чтобы избежать ошибки с init.sql):
+  ```bash
+  docker-compose down --volumes
+  docker-compose up --build
+  ```
