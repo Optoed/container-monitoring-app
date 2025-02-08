@@ -12,10 +12,12 @@ const App: React.FC = () => {
             console.log("results = ", results)
 
             const transformedResults = results.map((result: any) => {
-                const lastPingTime = new Date(result.lastPingTime).toLocaleString();
+                const last_ping_time = new Date(result.last_ping_time).toLocaleString();
+                const ping_duration = result.ping_duration / 1e6; //перевод в ms из наносекунд
                 return {
                     ...result,
-                    lastPingTime,
+                    last_ping_time,
+                    ping_duration,
                 };
             });
             setData(transformedResults);

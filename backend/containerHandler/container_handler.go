@@ -16,7 +16,7 @@ type Handler struct {
 func (h *Handler) GetContainers(w http.ResponseWriter, r *http.Request) {
 	var containers []models.Container
 	err := h.DB.Select(&containers,
-		"SELECT id, ip, status, last_ping_time, EXTRACT(EPOCH FROM ping_duration)::BIGINT AS ping_duration FROM containers")
+		"SELECT id, ip, status, last_ping_time, ping_duration FROM containers")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

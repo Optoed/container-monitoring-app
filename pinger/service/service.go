@@ -17,22 +17,22 @@ import (
 func GetContainers() ([]string, error) {
 	cmd := exec.Command("docker", "ps", "-aq")
 	output, err := cmd.Output()
-	log.Printf("output, err := cmd.Output(); output = %s, err = %v\n", output, err)
+	// log.Printf("output, err := cmd.Output(); output = %s, err = %v\n", output, err)
 	if err != nil {
 		return nil, err
 	}
 
 	containersID := string(output)
-	log.Println("containersID := string(output); containersID = ", containersID)
+	// log.Println("containersID := string(output); containersID = ", containersID)
 	ids := strings.Fields(containersID)
-	log.Println("ids := strings.Fields(containersID); ids = ", ids)
+	log.Println("IDs of containers = ", ids)
 
 	var ips []string
 	for _, id := range ids {
-		log.Println("id in range ids = ", id)
+		//log.Println("id in range ids = ", id)
 		psCmd := exec.Command("docker", "inspect", "--format", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", id)
 		ip, err := psCmd.Output()
-		log.Println("ip = ", ip)
+		//log.Println("ip = ", string(ip))
 		if err != nil {
 			log.Printf("Error getting IP for container %s: %v", id, err)
 			continue
@@ -40,7 +40,7 @@ func GetContainers() ([]string, error) {
 		ips = append(ips, strings.TrimSpace(string(ip)))
 	}
 
-	log.Println("ips = ", ips)
+	log.Println("IPs of containers = ", ips)
 	return ips, nil
 }
 
@@ -59,11 +59,13 @@ func PingContainer(ip string) (string, time.Duration, error) {
 	}
 
 	stats := pinger.Statistics()
+	pingDuration := stats.AvgRtt
+
 	if stats.PacketLoss > 0 {
-		return "down", stats.AvgRtt, nil
+		return "down", pingDuration, nil
 	}
 
-	return "alive", stats.AvgRtt, nil
+	return "alive", pingDuration, nil
 }
 
 func SendPingResult(container *models.Container) error {
