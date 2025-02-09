@@ -98,3 +98,7 @@
 - rabbitMQ consumer в backend
 ### Изменено
 - Переработана архитектура backend (MVC)
+
+## [0.11.1] - 09-02-2025
+### Изменено
+- initDB перемещен в repository
