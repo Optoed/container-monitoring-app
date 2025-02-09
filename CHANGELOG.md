@@ -91,5 +91,10 @@
 
 **merge containerize-frontend в main!**
 
-
-
+## [0.11.0] - 09-02-2025 - ветка rabbitmq
+### Добавлено
+- rabbitmq в docker-compose
+- producer.go (rabbitMQ producer) в pinger
+- rabbitMQ consumer в backend
+### Изменено
+- Переработана архитектура backend (MVC)

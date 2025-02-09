@@ -4,36 +4,40 @@ services:
   backend:
     build:
       context: ./backend
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
     environment:
       DB_HOST: db
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: postgres
-      FRONTEND_URL: http://frontend:80
+      FRONTEND_URL: "http://frontend:80"
+      RABBITMQ_URL: "amqp://rabbitmq:5672"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - rabbitmq
     networks:
       - app-network
 
   pinger:
     build:
       context: ./pinger
-    depends_on:
-      - backend
-    networks:
-      - app-network
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - "9090:9090"
     environment:
       # http://backend:8080/containers
       BACKEND_NAME: backend
       BACKEND_PORT: 8080
       BACKEND_ROUTE: containers
+      RABBITMQ_URL: "amqp://rabbitmq:5672"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend
+      - rabbitmq
+    networks:
+      - app-network
 
   db:
     build:
@@ -42,22 +46,30 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    networks:
-      - app-network
     ports:
       - "5432:5432"
+    networks:
+      - app-network
 
   frontend:
     build:
       context: ./frontend/docker-monitoring-frontend
       args:
         - REACT_APP_BACKEND_URL=http://backend:8080
+    environment:
+      - REACT_APP_BACKEND_URL=http://backend:8080
     ports:
       - "80:80"
     depends_on:
       - backend
-    environment:
-      - REACT_APP_BACKEND_URL=http://localhost:8080  # Для хоста (если это локальный запуск)
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "15672:15672"  # порты для доступа к менеджменту RabbitMQ
+      - "5672:5672"    # основной порт для очередей
     networks:
       - app-network
 

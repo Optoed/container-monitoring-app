@@ -2,6 +2,8 @@ package main
 
 import (
 	"backend/containerHandler"
+	"backend/repository"
+	"backend/service"
 	"fmt"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -15,7 +17,7 @@ import (
 
 var DB *sqlx.DB
 
-func main() {
+func initDB() {
 	var (
 		host     = os.Getenv("DB_HOST")
 		port     = os.Getenv("DB_PORT")
@@ -25,7 +27,7 @@ func main() {
 	)
 
 	databaseURL := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	log.Println("databaseURL = ", databaseURL)
+	//log.Println("databaseURL = ", databaseURL)
 
 	var err error
 	for i := 0; i < 10; i++ {
@@ -45,14 +47,18 @@ func main() {
 	} else {
 		log.Println("Successful connection to the database")
 	}
+}
+
+func main() {
+	initDB()
 	defer DB.Close()
 
-	// Создаем хэндлеры и передаем им ссылку на базу данных
-	handler := &containerHandler.Handler{DB: DB}
+	repo := &repository.Repository{DB: DB}
+	serv := &service.Service{Repo: repo}
+	handler := &containerHandler.Handler{Service: serv}
 
 	r := mux.NewRouter()
 	r.HandleFunc("/containers", handler.GetContainers).Methods("GET")
-	r.HandleFunc("/containers", handler.AddContainer).Methods("POST")
 
 	// Разрешим политику CORS только для собственного фронтенда,
 	// http://localhost:3000 - для взаимодействия на локальном пк
@@ -65,6 +71,12 @@ func main() {
 	// Оборачиваем наш маршрутизатор с CORS middleware
 	http.Handle("/", handlers.CORS(originsOk, headersOk, methodsOk)(r))
 
-	fmt.Println("Backend service started on 0.0.0.0:8080")
-	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
+	//Start consumer
+	go serv.StartConsume()
+
+	log.Println("Attempting to start HTTP server...")
+	err := http.ListenAndServe("0.0.0.0:8080", nil)
+	if err != nil {
+		log.Fatalf("Error starting server: %v", err)
+	}
 }
