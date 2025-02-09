@@ -111,3 +111,9 @@
 - Auth
 - nginx
 - netns
+
+## [1.1.0] - 09-02-2025
+### Добавлено
+- nginx.conf
+### Изменено
+- Dockerfile в frontend, используем nginx.conf

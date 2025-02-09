@@ -54,6 +54,7 @@ services:
   frontend:
     build:
       context: ./frontend/docker-monitoring-frontend
+      dockerfile: Dockerfile
       args:
         - REACT_APP_BACKEND_URL=http://backend:8080
     environment:
