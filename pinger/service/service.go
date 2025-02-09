@@ -1,15 +1,9 @@
 package service
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"github.com/go-ping/ping"
 	"log"
-	"net/http"
-	"os"
 	"os/exec"
-	"pinger/models"
 	"strings"
 	"time"
 )
@@ -66,15 +60,4 @@ func PingContainer(ip string) (string, time.Duration, error) {
 	}
 
 	return "alive", pingDuration, nil
-}
-
-func SendPingResult(container *models.Container) error {
-	// url := "http://backend:8080/containers"
-	url := fmt.Sprintf("http://%s:%s/%s", os.Getenv("BACKEND_NAME"), os.Getenv("BACKEND_PORT"), os.Getenv("BACKEND_ROUTE"))
-	data, err := json.Marshal(container)
-	if err != nil {
-		return err
-	}
-	_, err = http.Post(url, "application/json", bytes.NewBuffer(data))
-	return err
 }
